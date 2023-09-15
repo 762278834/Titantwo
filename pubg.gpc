@@ -1,0 +1,91 @@
+#pragma METAINFO("pubg", 1, 0, "awei")
+const int8 akm[7]={15,20,20,20,20,20,100};
+const int8 m762[7]={18,18,19,19,23,23,41};
+const int8 groza[7]={17,17,19,19,21,21,71};/*1*/
+const int8 ace32[7]={19,19,20,20,21,21,83};
+const int8 G36c[7]={16,18,21,21,22,22,83};
+const int8 m416[7]={18,19,21,21,22,22,83};
+const int8 scar_l[7]={16,17,20,20,21,21,90};
+const int8 qbz[7]={17,17,22,22,22,22,90};
+const int8 aug[7]={16,16,20,20,20,20,83};
+const int8 k2[7]={18,18,20,20,22,22,41};
+const int8 sli[7]={45,67,67,67,67,67,74};
+const int8 mini14[7]={45,67,67,67,67,67,74};
+const int8 sks[7]={45,67,67,67,67,67,78};
+const int8 vss[7]={45,67,72,72,72,72,67};
+const int8 qbu[7]={45,67,67,67,67,67,74};
+const int8 mk14[7]={45,67,67,67,67,67,74};
+const int8 mk12[7]={45,67,67,67,67,67,74};
+const int8 mk47[7]={32,40,35,35,35,35,81};
+const int8 m16[7]={32,35,35,35,35,35,88};
+const int8 pp_19[7]={16,16,16,16,16,16,83};
+const int8 thomson_submachine[7]={16,16,24,24,24,24,76};
+const int8 ump45[7]={16,16,16,16,18,18,47};
+const int8 uzi[7]={18,18,18,25,25,25,55};
+const int8 vector[7]={18,18,27,27,27,27,58};
+const int8 mpk5[7]={18,18,18,18,20,20,66};
+const int8 p90[7]={15,15,15,15,15,15,29};
+int8 *weapon5[4]={&akm,&m762,&groza,&ace32};
+int8 *weapon6[6]={&G36c,&m416,&scar_l,&qbz,&aug,&k2};
+int8 *weapon7[9]={&sli,&mini14,&sks,&vss,&qbu,&mk14,&mk12,&mk47,&m16};
+int8 *weapon8[7]={&pp_19,&thomson_submachine,&ump45,&uzi,&vector,&mpk5,&p90};
+int8 *weapon_level_1 ;
+int8 num1,num2,i = 0;
+int32 name1,name2,mode;
+fix32 sum;
+
+main {
+reverse_recoil();
+}
+
+
+void reverse_recoil(){
+    if(gcv_ready()) {
+        gcv_read(0, &name1);
+        gcv_read(4, &name2);
+        gcv_read(8, &mode);
+        gcv_read(12, &sum);
+        if (name1 == 5)
+            weapon_level_1 = weapon5[name2-1];
+        if (name1 == 6)
+            weapon_level_1 = weapon6[name2-1];
+        if (name1 == 7)
+            weapon_level_1 = weapon7[name2-1];
+        if (name1 == 8)
+            weapon_level_1 = weapon8[name2-1];
+        }
+    if (get_actual(BUTTON_5) && get_actual(BUTTON_8)  ){
+        combo_run(recoil);        
+        if (mode)
+            combo_run(point);
+    }
+    else
+        {
+        i = 0;
+        }
+    }
+combo recoil{
+    AntiRecoil(STICK_1_Y,(fix32)(*(weapon_level_1+i))*sum);
+    wait((int16)*(weapon_level_1+6)*5);
+    if (i <5)
+        i++;
+
+    
+    
+    }
+combo point{
+    set_val(BUTTON_5,100);
+    wait(30);
+    set_val(BUTTON_5,0);
+    wait(30);
+    }
+
+void AntiRecoil(uint8 AxisToApply, fix32 ARecoilToApply){
+    fix32 CurrentX = get_val(STICK_1_X);
+    fix32 CurrentY = get_val(STICK_1_Y);
+    fix32 MinARecoilFactor = 20.0 / 100.0;
+    fix32 MinARecoilToApply = MinARecoilFactor * ARecoilToApply;
+    fix32 MovementARecoilToApply = (1.0 - MinARecoilFactor) * ((ARecoilToApply * (100.0 - sqrt(sq(CurrentX)+ sq(CurrentY)))) / (100.0 + abs(CurrentX) + (sq(CurrentY)*0.5)));
+    set_val(AxisToApply,clamp(MinARecoilToApply + MovementARecoilToApply + get_val(AxisToApply),-100.00,100.00 - MinARecoilToApply));
+}    
+    
